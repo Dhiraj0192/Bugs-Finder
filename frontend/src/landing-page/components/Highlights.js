@@ -57,7 +57,7 @@ export default function Highlights() {
       id="highlights"
       sx={{
         pt: { xs: 4, sm: 10 },
-        pb: { xs: 8, sm: 5 },
+        pb: { xs: 8, sm: 10 },
         color: "white",
         bgcolor: "#06090a",
       }}

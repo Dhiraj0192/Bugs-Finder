@@ -12,9 +12,17 @@ import MenuItem from "@mui/material/MenuItem";
 import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import ToggleColorMode from "./ToggleColorMode";
-import SignUp from "./SignUp";
-import { colors } from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
+import { removeToken, getToken } from "../../services/localStorageService";
+import {
+  useUserDataQuery,
+  useLogoutUserMutation,
+} from "../../services/userAuthApi";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { unSetUserToken } from "../../features/authSlice";
+import { setUserToken } from "../../features/authSlice";
 
 const logoStyle = {
   width: "52px",
@@ -27,21 +35,49 @@ const logoStyle = {
 };
 
 function AppAppBar({ mode, toggleColorMode }) {
+  const { access_token } = getToken();
+  
+  const [logoutUser] = useLogoutUserMutation();
+
+  const dispatch = useDispatch();
+  // React.useEffect(() => {
+  //   dispatch(setUserToken({ access_token: access_token }));
+  // }, [access_token, dispatch]);
+  const Submit = async (event) => {
+    // let { csrf_key } = getToken();
+    const res = await logoutUser();
+
+    dispatch(unSetUserToken({ access_token: null }));
+    removeToken();
+    
+    navigate("/");
+    toast.success("Successfully Logout !", {});
+  };
+
   const [open, setOpen] = React.useState(false);
 
   const navigate = useNavigate();
   const gotoSignUp = () => {
     navigate("/signup");
   };
-  const gotoSignIn = () => {
-    navigate("/signin");
-  };
+
   const goToHome = () => {
     navigate("/");
   };
 
   const goToDebug = () => {
     navigate("/bugfinder");
+  };
+
+  const goToCheatSheet = () => {
+    navigate("/codecheatsheet");
+  };
+
+  const goToCodeAnalyse = () => {
+    navigate("/codeanalyse");
+  };
+  const goToUserchat = () => {
+    navigate("/userchat");
   };
 
   const toggleDrawer = (newOpen) => () => {
@@ -125,58 +161,147 @@ function AppAppBar({ mode, toggleColorMode }) {
                     Home
                   </Typography>
                 </MenuItem>
-                <MenuItem
-                  onClick={() => scrollToSection("features")}
-                  sx={{ py: "6px", px: "12px" }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Features
-                  </Typography>
-                </MenuItem>
+                {access_token ? (
+                  ""
+                ) : (
+                  <MenuItem
+                    onClick={() => scrollToSection("features")}
+                    sx={{ py: "6px", px: "12px" }}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Features
+                    </Typography>
+                  </MenuItem>
+                )}
 
-                <MenuItem
-                  onClick={() => scrollToSection("highlights")}
-                  sx={{ py: "6px", px: "12px" }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Highlights
-                  </Typography>
-                </MenuItem>
+                {access_token ? (
+                  ""
+                ) : (
+                  <MenuItem
+                    onClick={() => scrollToSection("highlights")}
+                    sx={{ py: "6px", px: "12px" }}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Highlights
+                    </Typography>
+                  </MenuItem>
+                )}
 
-                <MenuItem onClick={goToDebug} sx={{ py: "6px", px: "12px" }}>
-                  <Typography variant="body2" color="text.primary">
-                    Let's Debug
-                  </Typography>
-                </MenuItem>
+                {access_token ? (
+                  <MenuItem onClick={goToDebug} sx={{ py: "6px", px: "12px" }}>
+                    <Typography variant="body2" color="text.primary">
+                      Let's Find Bug
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  ""
+                )}
+
+                {access_token ? (
+                  <MenuItem
+                    onClick={goToCodeAnalyse}
+                    sx={{ py: "6px", px: "12px" }}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Analyse Code
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  ""
+                )}
+
+                {access_token ? (
+                  <MenuItem
+                    onClick={goToUserchat}
+                    sx={{ py: "6px", px: "12px" }}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Chats
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  ""
+                )}
+
+                {access_token ? (
+                  <MenuItem
+                    onClick={goToCheatSheet}
+                    sx={{ py: "6px", px: "12px" }}
+                  >
+                    <Typography variant="body2" color="text.primary">
+                      Cheat Sheet
+                    </Typography>
+                  </MenuItem>
+                ) : (
+                  ""
+                )}
               </Box>
             </Box>
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
-                gap: 0.5,
+                gap: 2,
                 alignItems: "center",
               }}
             >
-              <Button
-                color="primary"
-                variant="text"
-                size="small"
-                component="a"
-                onClick={gotoSignIn}
-                target="_blank"
-              >
-                Sign in
-              </Button>
-              <Button
-                color="primary"
-                variant="contained"
-                size="small"
-                component="a"
-                onClick={gotoSignUp}
-                target="_blank"
-              >
-                Sign up
-              </Button>
+              
+              {access_token ? (
+                ""
+              ) : (
+                <Button
+                  color="primary"
+                  variant="contained"
+                  size="small"
+                  component="a"
+                  onClick={goToHome}
+                  target="_blank"
+                  sx={{
+                    paddingLeft:3,
+                    paddingRight:3,
+                    fontSize:15
+                  }}
+                >
+                  Sign In
+                </Button>
+              )}
+              {access_token ? (
+                ""
+              ) : (
+                <Button
+                  color="primary"
+                  variant="contained"
+                  size="small"
+                  component="a"
+                  onClick={gotoSignUp}
+                  target="_blank"
+                  sx={{
+                    paddingLeft:3,
+                    paddingRight:3,
+                    fontSize:15
+                  }}
+                >
+                  Sign up
+                </Button>
+              )}
+              {access_token ? (
+                <Button
+                  color="primary"
+                  variant="contained"
+                  size="small"
+                  component="a"
+                  onClick={Submit}
+                  target="_blank"
+                  sx={{
+                    paddingLeft:3,
+                    paddingRight:3,
+                    fontSize:15
+                  }}
+                >
+                  Logout
+                </Button>
+              ) : (
+                ""
+              )}
             </Box>
             <Box sx={{ display: { sm: "", md: "none" } }}>
               <Button
@@ -211,40 +336,79 @@ function AppAppBar({ mode, toggleColorMode }) {
                     />
                   </Box>
                   <MenuItem onClick={goToHome}>Home</MenuItem>
-                  <MenuItem onClick={() => scrollToSection("features")}>
-                    Features
-                  </MenuItem>
+                  {access_token ? (
+                    ""
+                  ) : (
+                    <MenuItem onClick={() => scrollToSection("features")}>
+                      Features
+                    </MenuItem>
+                  )}
 
-                  <MenuItem onClick={() => scrollToSection("highlights")}>
-                    Highlights
-                  </MenuItem>
+                  {access_token ? (
+                    ""
+                  ) : (
+                    <MenuItem onClick={() => scrollToSection("highlights")}>
+                      Highlights
+                    </MenuItem>
+                  )}
+                  {access_token ? (
+                    <MenuItem onClick={goToDebug}>Let's Find Bug</MenuItem>
+                  ) : (
+                    ""
+                  )}
 
-                  <MenuItem onClick={goToDebug}>Let's Debug</MenuItem>
+                  {access_token ? (
+                    <MenuItem onClick={goToCodeAnalyse}>Analyse Code</MenuItem>
+                  ) : (
+                    ""
+                  )}
+
+                  {access_token ? (
+                    <MenuItem onClick={goToUserchat}>Chats</MenuItem>
+                  ) : (
+                    ""
+                  )}
+
+                  {access_token ? (
+                    <MenuItem onClick={goToCheatSheet}>Cheat Sheet</MenuItem>
+                  ) : (
+                    ""
+                  )}
+
                   <Divider />
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      component="a"
-                      onClick={gotoSignUp}
-                      target="_blank"
-                      sx={{ width: "100%" }}
-                    >
-                      Sign up
-                    </Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      component="a"
-                      onClick={gotoSignIn}
-                      target="_blank"
-                      sx={{ width: "100%" }}
-                    >
-                      Sign in
-                    </Button>
-                  </MenuItem>
+                  {access_token ? (
+                    ""
+                  ) : (
+                    <MenuItem>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        component="a"
+                        onClick={gotoSignUp}
+                        target="_blank"
+                        sx={{ width: "100%" }}
+                      >
+                        Sign up
+                      </Button>
+                    </MenuItem>
+                  )}
+
+                  {access_token ? (
+                    ""
+                  ) : (
+                    <MenuItem>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        component="a"
+                        onClick={goToHome}
+                        target="_blank"
+                        sx={{ width: "100%" }}
+                      >
+                        Sign In
+                      </Button>
+                    </MenuItem>
+                  )}
                 </Box>
               </Drawer>
             </Box>

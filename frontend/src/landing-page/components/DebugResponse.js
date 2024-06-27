@@ -67,6 +67,7 @@ const DebugResponse = () => {
               fontSize: "17px",
               fontWeight: 300,
               lineHeight: 1.8,
+              whiteSpace: "pre-wrap",
             }}
             dangerouslySetInnerHTML={{ __html: resultData }}
           ></p>

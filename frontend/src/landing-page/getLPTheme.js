@@ -68,6 +68,7 @@ const getDesignTokens = (mode) => ({
         dark: brand[800],
       }),
     },
+    
     secondary: {
       light: secondary[300],
       main: secondary[500],
@@ -82,6 +83,11 @@ const getDesignTokens = (mode) => ({
       main: '#F7B538',
       dark: '#F79F00',
       ...(mode === 'dark' && { main: '#F7B538', dark: '#F79F00' }),
+    },
+    bug: {
+      main: red[700],
+      dark: red[700],
+      ...(mode === 'dark' && { main: red[600], dark: red[700] }),
     },
     error: {
       light: red[50],

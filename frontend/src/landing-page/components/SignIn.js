@@ -19,9 +19,17 @@ import getLPTheme from "../getLPTheme";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-
-import { useLoginUserMutation } from "../../services/userAuthApi";
+import { useDispatch } from "react-redux";
+import {
+  useLoginUserMutation,
+  useCsrftokenMutation,
+} from "../../services/userAuthApi";
+import { storeToken, getToken } from "../../services/localStorageService";
 import { Alert } from "@mui/material";
+import { toast } from "react-toastify";
+import { setUserToken } from "../../features/authSlice";
+import axios, { isCancel, AxiosError } from "axios";
+import Cookies from "js-cookie";
 
 function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
   return (
@@ -58,7 +66,10 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
   const [loginUser, { isLoading }] = useLoginUserMutation();
+  const [csrftoken] = useCsrftokenMutation();
   const [server_error, setServerError] = React.useState({});
+
+  const dispatch = useDispatch();
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -66,15 +77,30 @@ export default function SignIn() {
       email: data.get("email"),
       password: data.get("password"),
     };
-    console.log(actualData);
+
     const res = await loginUser(actualData);
-    console.log(res);
+
     if (res.error) {
-      setServerError(res.error.data.errors);
+      setServerError(res.error.data);
     }
     if (res.data) {
       console.log(res.data);
-      navigate("/bugfinder");
+      // let session_key = {
+      //   session_key: Cookies.get("sessionid"),
+      // };
+      // console.log(session_key);
+
+      // const response = await csrftoken();
+      
+
+      storeToken(res.data.token2);
+
+      // console.log(res.data.session_key);
+      let { access_token } = getToken();
+
+      dispatch(setUserToken({ access_token: access_token }));
+      navigate("/");
+      toast.success("Successfully Login !", {});
     }
   };
 
@@ -95,6 +121,11 @@ export default function SignIn() {
   const gotoSignUp = () => {
     navigate("/signup");
   };
+
+  let { access_token } = getToken();
+  React.useEffect(() => {
+    dispatch(setUserToken({ access_token: access_token }));
+  }, [access_token, dispatch]);
 
   return (
     <ThemeProvider theme={showCustomTheme ? LPtheme : defaultTheme}>
@@ -145,9 +176,8 @@ export default function SignIn() {
                   id="email"
                   label="Email Address"
                   name="email"
-                  autoComplete="email"
                 />
-                {server_error.email ? (
+                {/* {server_error.email ? (
                   <Typography
                     style={{
                       fontSize: 12,
@@ -160,7 +190,7 @@ export default function SignIn() {
                   </Typography>
                 ) : (
                   ""
-                )}
+                )} */}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -174,7 +204,7 @@ export default function SignIn() {
                   type="password"
                   id="password"
                 />
-                {server_error.password ? (
+                {server_error.detail ? (
                   <Typography
                     style={{
                       fontSize: 12,
@@ -183,31 +213,28 @@ export default function SignIn() {
                       paddingTop: 5,
                     }}
                   >
-                    {server_error.password[0]}
+                    {server_error.detail}
                   </Typography>
                 ) : (
                   ""
                 )}
               </Grid>
             </Grid>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              {isLoading ? "Please Wait...." : "Sign In"}
             </Button>
             <Grid container>
-              <Grid item xs>
+              {/* <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
-              </Grid>
+              </Grid> */}
               <Grid item>
                 <Link onClick={gotoSignUp} variant="body2">
                   {"Don't have an account? Sign Up"}
@@ -224,7 +251,7 @@ export default function SignIn() {
         </Box>
       </Container>
 
-      <Footer />
+      {/* <Footer /> */}
       <ToggleCustomTheme
         showCustomTheme={showCustomTheme}
         toggleCustomTheme={toggleCustomTheme}

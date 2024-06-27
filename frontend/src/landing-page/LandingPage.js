@@ -17,8 +17,17 @@ import Features from "./components/Features";
 
 import Footer from "./components/Footer";
 import getLPTheme from "./getLPTheme";
+import { getToken } from "../services/localStorageService";
+import { setUserToken } from "../features/authSlice";
+import { useDispatch } from "react-redux";
 
 function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }) {
+  const { access_token } = getToken();
+
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(setUserToken({ access_token: access_token }));
+  }, [access_token, dispatch]);
   return (
     <Box
       sx={{
@@ -73,14 +82,15 @@ export default function LandingPage() {
       <CssBaseline />
       <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
       <Hero />
-      <Divider />
+      <Divider sx={{backgroundColor:"#7069cc"}} />
       <Box sx={{ bgcolor: "background.default" }}>
         <Features />
-        <Divider />
+        <Divider sx={{backgroundColor:"#7069cc"}} />
 
-        <Divider />
+        <Divider sx={{backgroundColor:"#7069cc"}}/>
         <Highlights />
-        <Footer />
+        <Divider sx={{backgroundColor:"#7069cc"}}/>
+        <Footer  />
       </Box>
       <ToggleCustomTheme
         showCustomTheme={showCustomTheme}

@@ -8,9 +8,32 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import SignIn from "./SignIn";
+import { getToken,storeUser,getUser } from "../../services/localStorageService";
+import {
+  useUserDataQuery,
+} from "../../services/userAuthApi";
 
 export default function Hero() {
   const [open, setOpen] = React.useState(false);
+  const { access_token } = getToken();
+  
+
+  const { data, isSuccess } = useUserDataQuery(access_token);
+
+  let { name } = getUser();
+
+  const [userData, setUserData ] = React.useState({
+    name: "",
+  })
+
+  React.useEffect(()=>{
+    if(data && isSuccess){
+      setUserData({
+        name:data.name,
+      })
+    }
+  },[data,isSuccess])
 
   const navigate = useNavigate();
   const gotoSignUp = () => {
@@ -20,6 +43,11 @@ export default function Hero() {
     <Box
       id="hero"
       sx={(theme) => ({
+        display: "flex",
+        paddingLeft: "100px",
+        paddingRight: "50px",
+        alignItems: "center",
+        justifyContent: "center",
         width: "100%",
         backgroundImage:
           theme.palette.mode === "light"
@@ -34,11 +62,15 @@ export default function Hero() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          pt: { xs: 14, sm: 20 },
-          pb: { xs: 8, sm: 12 },
+          pt: { xs: 14, sm: 23 },
+          pb: { xs: 8, sm: 10 },
         }}
       >
-        <Stack spacing={2} useFlexGap sx={{ width: { xs: "100%", sm: "70%" } }}>
+        <Stack
+          spacing={2}
+          useFlexGap
+          sx={{ width: { xs: "100%", sm: "100%" } }}
+        >
           <Typography
             component="h1"
             variant="h1"
@@ -49,7 +81,9 @@ export default function Hero() {
               textAlign: "center",
             }}
           >
-            Our Bug&nbsp;
+            {
+              isSuccess? "Welcome , ":"Our Bug "
+            }
             <Typography
               component="span"
               variant="h1"
@@ -58,9 +92,13 @@ export default function Hero() {
                   theme.palette.mode === "light"
                     ? "primary.main"
                     : "primary.light",
+
+                marginLeft:2
               }}
             >
-              Finder
+              {
+                isSuccess? userData.name:"Finder"
+              }
             </Typography>
           </Typography>
           <Typography variant="body1" textAlign="center" color="text.secondary">
@@ -72,42 +110,36 @@ export default function Hero() {
             streamline your coding process and improve the quality of your
             Python projects..
           </Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            alignSelf="center"
-            spacing={1}
-            useFlexGap
-            sx={{ pt: 2, width: { xs: "100%", sm: "auto" } }}
-          >
-            <TextField
-              id="outlined-basic"
-              hiddenLabel
-              size="small"
-              variant="outlined"
-              aria-label="Enter your email address"
-              placeholder="Your email address"
-              inputProps={{
-                autocomplete: "off",
-                ariaLabel: "Enter your email address",
-              }}
-            />
-            <Button onClick={gotoSignUp} variant="contained" color="primary">
-              Start now
-            </Button>
-          </Stack>
-          <Typography
-            variant="caption"
-            textAlign="center"
-            sx={{ opacity: 0.8 }}
-          >
-            By clicking &quot;Start now&quot; you agree to our&nbsp;
-            <Link href="#" color="primary">
-              Terms & Conditions
-            </Link>
-            .
-          </Typography>
+          
+          {access_token ? (
+            ""
+          ) : (
+            <Typography
+              variant="caption"
+              textAlign="center"
+              sx={{ opacity: 0.8 }}
+            >
+              By clicking &quot;Sign In&quot; you agree to our&nbsp;
+              <Link href="#" color="primary">
+                Terms & Conditions
+              </Link>
+              .
+            </Typography>
+          )}
         </Stack>
       </Container>
+      {access_token ? (
+        ""
+      ) : (
+        <Container
+          sx={{
+            width: "75%",
+            marginRight: "100px",
+          }}
+        >
+          <SignIn></SignIn>
+        </Container>
+      )}
     </Box>
   );
 }

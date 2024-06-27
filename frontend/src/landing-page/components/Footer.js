@@ -35,7 +35,7 @@ export default function Footer() {
         flexDirection: "column",
         alignItems: "center",
         gap: { xs: 4, sm: 8 },
-        py: { xs: 8, sm: 10 },
+        py: { xs: 8, sm: 5 },
         textAlign: { sm: "center", md: "left" },
       }}
     >
@@ -43,10 +43,9 @@ export default function Footer() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          pt: { xs: 4, sm: 8 },
+          
           width: "100%",
-          borderTop: "1px solid",
-          borderColor: "divider",
+          
         }}
       >
         <div>
